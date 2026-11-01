@@ -1,5 +1,8 @@
 # jianbao — Executive Brief Generator
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+
 **Turn any topic into a 1–3 page A4 executive brief: researched, sourced, and typeset. One JSON file, three layouts, four color themes, HTML + PDF out.**
 
 简体中文说明见 [README.zh-CN.md](README.zh-CN.md)。
