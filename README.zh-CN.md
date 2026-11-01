@@ -39,26 +39,100 @@ English version: [README.md](README.md)
 
 ## 安装
 
-本仓库遵循 `SKILL.md` 约定，两种用法。
+不需要 `pip install`，也没有虚拟环境要激活——脚本只用 Python 标准库。所谓安装，就是**把文件夹放到位**，可选的再注册成一个 skill。
 
-**作为 Agent skill**（WorkBuddy 及兼容宿主）：
+### 1. 获取代码
 
 ```bash
 git clone https://github.com/difeijingscu/jianbao-skill.git
-cp -r jianbao-skill ~/.workbuddy/skills/jianbao   # 目录名必须是 jianbao
+cd jianbao-skill
 ```
 
-然后直接说：*「给老板做一份 AI 芯片出口管制简报」*。Agent 会加载本 skill，问清版式与配色，检索、写 `content.json`、渲染、跑两道闸门。
+没装 Git 也行：在 GitHub 页面点 **Code → Download ZIP** 解压，效果完全一样。
 
-**作为普通命令行工具**（脚本不依赖 Agent）：
+### 2. 检查两个前置条件
 
 ```bash
-python scripts/new_brief.py ./my-brief --topic "AI芯片出口管制" --title "AI芯片出口管制：执行口径出现分化"
-python scripts/build.py my-brief/content.json --layout L1 --theme T1
-python scripts/check_layout.py 简报-*.html
-python scripts/validate.py my-brief/content.json --html 简报-*.html
-python scripts/to_pdf.py 简报-*.html
+python3 -c "import sys; print(sys.version)"     # 需 3.8 以上
+python3 -c "import sys; sys.path.insert(0,'scripts'); import config; print(config.browser())"
 ```
+
+第二条必须打印出 Chrome / Chromium / Edge 的路径。如果报 `未找到 Chrome/Edge`，装一个 Chromium 内核浏览器，或直接指定路径：
+
+```bash
+export JB_BROWSER=/path/to/chrome        # Windows：set JB_BROWSER=C:\path\to\chrome.exe
+```
+
+Windows 上的解释器通常叫 `python` 而不是 `python3`。非中文系统还需要中文字体，见上方「环境要求」。
+
+### 3. 选择使用方式
+
+**A. 作为 Agent skill**（推荐）。把文件夹放进宿主读取 skill 的目录，**目录名必须是 `jianbao`**（要与 `SKILL.md` 里的 `name:` 一致）：
+
+| 宿主 | 安装位置 |
+|---|---|
+| WorkBuddy | `~/.workbuddy/skills/jianbao`，Windows 为 `C:\Users\<你>\.workbuddy\skills\jianbao` |
+| Claude Code | `~/.claude/skills/jianbao`（项目级：`.claude/skills/jianbao`） |
+| 其他 `SKILL.md` 宿主 | 该宿主约定的 skills 目录 |
+
+```bash
+mkdir -p ~/.workbuddy/skills
+cp -r jianbao-skill ~/.workbuddy/skills/jianbao
+```
+
+开一个新会话，直接说需求即可，例如：*「给老板做一份 AI 芯片出口管制简报」*。Agent 会加载本 skill，问清版式与配色，检索、写 `content.json`、渲染、跑两道闸门。
+
+**B. 作为普通命令行工具**（不依赖 Agent）。文件夹放在任意位置，脚本按路径调用：
+
+```bash
+S=/path/to/jianbao-skill/scripts
+python3 $S/new_brief.py ./my-brief --topic "AI芯片出口管制"   # 产出 my-brief/content.json，填掉 TODO
+python3 $S/build.py my-brief/content.json --layout L1 --theme T1
+python3 $S/check_layout.py 简报-*.html
+python3 $S/validate.py my-brief/content.json --html 简报-*.html
+python3 $S/to_pdf.py 简报-*.html
+```
+
+常用的话可以加个别名：
+
+```bash
+alias jb-build='python3 /path/to/jianbao-skill/scripts/build.py'
+```
+
+### 4. 验证安装
+
+在仓库根目录用自带的虚构示例跑一遍，约一分钟：
+
+```bash
+cd jianbao-skill
+python3 scripts/build.py assets/example/content.json -o demo.html --layout L1 --theme T1
+python3 scripts/check_layout.py demo.html
+python3 scripts/validate.py assets/example/content.json --html demo.html
+python3 scripts/to_pdf.py demo.html
+```
+
+预期输出：
+
+```
+HTML -> /…/demo.html
+版式=L1(双页标准) 配色=T1(商务蓝) 段数=9 页数=2
+OK  demo.html P1  overflow=0 cfill=81.5%
+OK  demo.html P2  overflow=0 cfill=83.6%
+---- 页数=2 最大溢出=0px 内容填充率低于 62% 的页=无
+---- 通过：0 ERROR / 0 WARN
+PDF -> /…/demo.pdf  size=357.1KB  pages=2
+```
+
+两页 A4、零溢出、零校验错误、出一个 PDF，环境就通了。填充率与 PDF 体积会因字体和浏览器版本略有差异，**只要 `overflow=0` 和 `0 ERROR` 成立即为正常**。`demo.html` / `demo.pdf` 是临时文件，可以直接删。哪一步失败，看 [references/troubleshooting.md](references/troubleshooting.md)。
+
+### 5. 更新与卸载
+
+```bash
+cd jianbao-skill && git pull           # 更新；ZIP 安装则重新下载替换
+rm -rf ~/.workbuddy/skills/jianbao     # 卸载
+```
+
+不在文件夹之外写任何东西：没有全局状态、不写注册表、不起后台进程。
 
 ## 五步流程
 

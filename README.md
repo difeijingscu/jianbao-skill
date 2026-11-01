@@ -39,26 +39,100 @@ All four images are rendered from the same `assets/example/content.json` (fictio
 
 ## Install
 
-This repo follows the `SKILL.md` convention, so it works in two ways.
+There is nothing to `pip install` and no environment to activate — the scripts use the Python standard library only. Installing means **placing the folder** and, optionally, registering it as a skill.
 
-**As an agent skill** (WorkBuddy and compatible hosts) — put it where your host looks for skills:
+### 1. Get the code
 
 ```bash
 git clone https://github.com/difeijingscu/jianbao-skill.git
-cp -r jianbao-skill ~/.workbuddy/skills/jianbao   # directory name must be jianbao
+cd jianbao-skill
 ```
 
-Then just ask: *"给老板做一份 AI 芯片出口管制简报"*. The agent loads the skill, asks for layout and theme, researches, writes `content.json`, renders, and runs both gates.
+No Git? Use **Code → Download ZIP** on GitHub and unzip — the unpacked folder behaves identically.
 
-**As a plain CLI** — the scripts have no agent dependency:
+### 2. Check the two prerequisites
 
 ```bash
-python scripts/new_brief.py ./my-brief --topic "AI芯片出口管制" --title "AI芯片出口管制：执行口径出现分化"
-python scripts/build.py my-brief/content.json --layout L1 --theme T1
-python scripts/check_layout.py 简报-*.html
-python scripts/validate.py my-brief/content.json --html 简报-*.html
-python scripts/to_pdf.py 简报-*.html
+python3 -c "import sys; print(sys.version)"     # 3.8 or newer
+python3 -c "import sys; sys.path.insert(0,'scripts'); import config; print(config.browser())"
 ```
+
+The second command must print a path to Chrome / Chromium / Edge. If it raises `未找到 Chrome/Edge`, install a Chromium browser or point at it explicitly:
+
+```bash
+export JB_BROWSER=/path/to/chrome        # Windows: set JB_BROWSER=C:\path\to\chrome.exe
+```
+
+On Windows the interpreter is usually `python`, not `python3`. Non-Chinese systems also need CJK fonts (see Requirements).
+
+### 3. Choose how to use it
+
+**A. As an agent skill** — the intended route. Copy the folder into the directory your host reads skills from; the folder name must be `jianbao` (it has to match `name:` in `SKILL.md`):
+
+| Host | Install location |
+|---|---|
+| WorkBuddy | `~/.workbuddy/skills/jianbao` — Windows: `C:\Users\<you>\.workbuddy\skills\jianbao` |
+| Claude Code | `~/.claude/skills/jianbao` (project-scoped: `.claude/skills/jianbao`) |
+| other `SKILL.md` hosts | wherever that host loads skills from |
+
+```bash
+mkdir -p ~/.workbuddy/skills
+cp -r jianbao-skill ~/.workbuddy/skills/jianbao
+```
+
+Start a new session, then just ask: *"给老板做一份 AI 芯片出口管制简报"*. The agent loads the skill, asks for layout and theme, researches, writes `content.json`, renders, and runs both gates.
+
+**B. As a plain CLI** — no agent required. Leave the folder anywhere; every script is called by path:
+
+```bash
+S=/path/to/jianbao-skill/scripts
+python3 $S/new_brief.py ./my-brief --topic "AI芯片出口管制"   # → my-brief/content.json (fill in the TODOs)
+python3 $S/build.py my-brief/content.json --layout L1 --theme T1
+python3 $S/check_layout.py 简报-*.html
+python3 $S/validate.py my-brief/content.json --html 简报-*.html
+python3 $S/to_pdf.py 简报-*.html
+```
+
+Optional shortcut if you use it regularly:
+
+```bash
+alias jb-build='python3 /path/to/jianbao-skill/scripts/build.py'
+```
+
+### 4. Verify the install
+
+One minute, from the repo root, using the bundled fictional sample:
+
+```bash
+cd jianbao-skill
+python3 scripts/build.py assets/example/content.json -o demo.html --layout L1 --theme T1
+python3 scripts/check_layout.py demo.html
+python3 scripts/validate.py assets/example/content.json --html demo.html
+python3 scripts/to_pdf.py demo.html
+```
+
+Expected output:
+
+```
+HTML -> /…/demo.html
+版式=L1(双页标准) 配色=T1(商务蓝) 段数=9 页数=2
+OK  demo.html P1  overflow=0 cfill=81.5%
+OK  demo.html P2  overflow=0 cfill=83.6%
+---- 页数=2 最大溢出=0px 内容填充率低于 62% 的页=无
+---- 通过：0 ERROR / 0 WARN
+PDF -> /…/demo.pdf  size=357.1KB  pages=2
+```
+
+Two A4 pages, no overflow, no validation errors, one PDF — the environment is ready. Exact fill rates and PDF size vary slightly with fonts and browser version; what must hold is `overflow=0` and `0 ERROR`. `demo.html` / `demo.pdf` are throwaway files. If a step fails, see [references/troubleshooting.md](references/troubleshooting.md).
+
+### 5. Update and uninstall
+
+```bash
+cd jianbao-skill && git pull           # update; a ZIP install: download and replace the folder
+rm -rf ~/.workbuddy/skills/jianbao     # uninstall
+```
+
+Nothing is written outside the folder: no global state, no registry entries, no daemon.
 
 ## The five steps
 

@@ -57,6 +57,18 @@
 如 `Super-agent` → `Superagent`。这是有意的（避免文件名里出现空格与特殊符号），不是 bug。
 需要精确控制文件名时用 `build.py -o` 指定。
 
+### 8. 装好了但 skill 不触发
+
+- **目录名必须是 `jianbao`**，要与 `SKILL.md` 里的 `name:` 一致。`cp -r jianbao-skill ~/.workbuddy/skills/` 会留下
+  `skills/jianbao-skill/`，名字不匹配，宿主找不到。正确写法是目标路径带 `/jianbao`。
+- 复制完要**开新会话**，宿主一般在会话启动时扫描 skills 目录。
+- 用 `git clone` 后直接在里面新建简报也可以，但简报项目目录建议放仓库外，避免 `git status` 里全是渲染产物。
+
+### 9. 命令找不到 python
+
+Windows 上解释器通常叫 `python`（或 `py -3`），Linux / macOS 上是 `python3`。
+`python: command not found` 不代表没装，换一个名字试；`python -V` 输出 3.8 以上即可。
+
 ## 打印尺寸基准
 
 A4 @96dpi：`210mm = 794px`，`297mm = 1123px`。

@@ -10,6 +10,8 @@ venv/
 简报-*.pdf
 layout.json
 docs/_*.html
+demo.html
+demo.pdf
 
 # 系统与编辑器
 .DS_Store
