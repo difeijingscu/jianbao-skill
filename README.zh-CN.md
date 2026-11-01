@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Release](https://img.shields.io/github/v/release/difeijingscu/jianbao-skill)](https://github.com/difeijingscu/jianbao-skill/releases)
 
 **把任意主题压成 1–3 页 A4 高管简报：先检索核实，再定版出稿。一份 JSON，三套版式，四套配色，输出 HTML + PDF。**
 
